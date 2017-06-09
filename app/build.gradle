@@ -1,5 +1,17 @@
 apply plugin: 'com.android.application'
 
+// TODO: Pronghorn
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven {
+        url "https://repository-pronghorn.forge.cloudbees.com/snapshot"
+    }
+    maven {
+        url "https://repository-pronghorn.forge.cloudbees.com/release"
+    }
+}
+
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.3"
@@ -10,12 +22,22 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        jackOptions {
+            enabled true
+        }
     }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
@@ -28,6 +50,8 @@ dependencies {
     testCompile 'junit:junit:4.12'
 
     // TODO: Pronghorn
+    compile 'com.ociweb:FogLight:+'
+    compile 'org.slf4j:slf4j-api:1.7.12'
 
     // TODO: added for things.
     provided 'com.google.android.things:androidthings:0.4-devpreview'
