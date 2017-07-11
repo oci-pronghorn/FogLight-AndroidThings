@@ -12,7 +12,7 @@ import com.ociweb.pronghorn.stage.scheduling.GraphManager;
 public class ProvidedHardwareImpl extends HardwareImpl {
 
     public ProvidedHardwareImpl(GraphManager gm) {
-        super(gm, new AndroidI2CBacking());
+        super(gm, new String[]{}, new AndroidI2CBacking());
     }
 
     @Override
