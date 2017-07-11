@@ -3,20 +3,19 @@ package objectcomputing.com.thingstest;
 import android.app.Activity;
 import android.os.Bundle;
 
-import com.ociweb.iot.maker.DeviceRuntime;
 import com.ociweb.iot.IoTApp;
+import com.ociweb.iot.maker.FogRuntime;
 
 public class MainActivity extends Activity {
 
     private static final String TAG = "MainActivity";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // TODO: Pronghorn
-        DeviceRuntime.run(new IoTApp());
+        FogRuntime.run(new IoTApp());
 
 //        // This service lets us talk to hardware.
 //        PeripheralManagerService service = new PeripheralManagerService();

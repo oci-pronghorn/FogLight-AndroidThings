@@ -9,56 +9,58 @@
  * (argument) -> (body). 
  * <p>
  */
-
-
 package com.ociweb.iot;
 
-import static com.ociweb.iot.grove.GroveTwig.LED;
-import static com.ociweb.iot.maker.Port.D4;
+import static com.ociweb.iot.grove.AnalogDigitalTwig.LED;
+import static com.ociweb.iot.maker.Port.D5;
 
-import com.ociweb.gl.api.GreenCommandChannel;
 import com.ociweb.gl.api.MessageReader;
 import com.ociweb.gl.api.PubSubListener;
 import com.ociweb.gl.api.PubSubWritable;
-import com.ociweb.gl.api.PubSubWriter;
 import com.ociweb.gl.api.StartupListener;
-import com.ociweb.iot.maker.CommandChannel;
-import com.ociweb.iot.maker.DeviceRuntime;
+import com.ociweb.iot.maker.FogCommandChannel;
+import com.ociweb.iot.maker.FogRuntime;
 import com.ociweb.iot.maker.Hardware;
-import com.ociweb.iot.maker.IoTSetup;
+import com.ociweb.iot.maker.FogApp;
 import com.ociweb.iot.maker.Port;
+import com.ociweb.pronghorn.pipe.BlobWriter;
 
-public class IoTApp implements IoTSetup {
+import java.io.IOException;
+
+public class IoTApp implements FogApp {
 
     private static final String TOPIC = "light";
     private static final int PAUSE = 500;
-    public static final Port LED_PORT = D4;
+    public static final Port LED_PORT = D5;
 
     public static void main( String[] args) {
-        DeviceRuntime.run(new IoTApp());
+        FogRuntime.run(new IoTApp());
     }
 
     @Override
     public void declareConnections(Hardware c) {
-        c.connect(LED, D4);
+        c.connect(LED, D5);
+
     }
 
     @Override
-    public void declareBehavior(DeviceRuntime runtime) {
+    public void declareBehavior(FogRuntime runtime) {
 
-        final CommandChannel blinkerChannel = runtime.newCommandChannel(GreenCommandChannel.DYNAMIC_MESSAGING);
+        final FogCommandChannel blinkerChannel = runtime.newCommandChannel(DYNAMIC_MESSAGING);
         runtime.addPubSubListener(new PubSubListener() {
             @Override
             public boolean message(CharSequence topic, MessageReader payload) {
 
                 boolean value = payload.readBoolean();
-                blinkerChannel.setValueAndBlock(LED_PORT, value ? 1 : 0, PAUSE);
-                boolean ignored = blinkerChannel.openTopic(TOPIC, new PubSubWritable() {
+                blinkerChannel.setValueAndBlock(LED_PORT, value, PAUSE);
+                boolean ignored = blinkerChannel.publishTopic(TOPIC, new PubSubWritable() {
                     @Override
-                    public void write(PubSubWriter w) {
-                        w.writeBoolean(!value);
-                        w.publish();
-
+                    public void write(BlobWriter w) {
+                        try {
+                            w.writeBoolean(!value);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
                 return true;
@@ -66,16 +68,19 @@ public class IoTApp implements IoTSetup {
             }
         }).addSubscription(TOPIC);
 
-        final CommandChannel startupChannel = runtime.newCommandChannel(GreenCommandChannel.DYNAMIC_MESSAGING);
+        final FogCommandChannel startupChannel = runtime.newCommandChannel(DYNAMIC_MESSAGING);
         runtime.addStartupListener(
                 new StartupListener() {
                     @Override
                     public void startup() {
-                        boolean ignored = startupChannel.openTopic(TOPIC, new PubSubWritable() {
+                        boolean ignored = startupChannel.publishTopic(TOPIC, new PubSubWritable() {
                             @Override
-                            public void write(PubSubWriter w) {
-                                w.writeBoolean(true);
-                                w.publish();
+                            public void write(BlobWriter w) {
+                                try {
+                                    w.writeBoolean(true);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         });
                     }
