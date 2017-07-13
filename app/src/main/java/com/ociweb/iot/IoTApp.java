@@ -25,8 +25,6 @@ import com.ociweb.iot.maker.FogApp;
 import com.ociweb.iot.maker.Port;
 import com.ociweb.pronghorn.pipe.BlobWriter;
 
-import java.io.IOException;
-
 public class IoTApp implements FogApp {
 
     private static final String TOPIC = "light";
@@ -56,11 +54,7 @@ public class IoTApp implements FogApp {
                 boolean ignored = blinkerChannel.publishTopic(TOPIC, new PubSubWritable() {
                     @Override
                     public void write(BlobWriter w) {
-                        try {
-                            w.writeBoolean(!value);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
+                        w.writeBoolean(!value);
                     }
                 });
                 return true;
@@ -76,11 +70,7 @@ public class IoTApp implements FogApp {
                         boolean ignored = startupChannel.publishTopic(TOPIC, new PubSubWritable() {
                             @Override
                             public void write(BlobWriter w) {
-                                try {
-                                    w.writeBoolean(true);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
+                                w.writeBoolean(true);
                             }
                         });
                     }
