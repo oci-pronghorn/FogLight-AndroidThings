@@ -17,7 +17,7 @@ android {
     buildToolsVersion "25.0.3"
     defaultConfig {
         applicationId "objectcomputing.com.thingstest"
-        minSdkVersion 25
+        minSdkVersion 24
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -50,9 +50,12 @@ dependencies {
     testCompile 'junit:junit:4.12'
 
     // TODO: Pronghorn
-    compile 'com.ociweb:FogLight:+'
+    compile ('com.ociweb:FogLight:0.1.3-SNAPSHOT'){
+        exclude group: 'com.ociweb', module: 'Pronghorn'
+        exclude group: 'com.ociweb', module: 'GreenLightning'
+    }
     compile 'org.slf4j:slf4j-api:1.7.12'
 
     // TODO: added for things.
-    provided 'com.google.android.things:androidthings:0.4-devpreview'
+    provided 'com.google.android.things:androidthings:0.4.1-devpreview'
 }
