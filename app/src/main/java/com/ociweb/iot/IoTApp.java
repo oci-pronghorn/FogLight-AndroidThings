@@ -1,17 +1,17 @@
 /**
- * blinkerChannel is a CommandChannel created to transport data. 
+ * blinkerChannel is a CommandChannel created to transport data.
  * Data is published to the channel. When  the blinkerChannel is
- * subscribed to the channel, the published data can also be accessed 
+ * subscribed to the channel, the published data can also be accessed
  * by playload.writeBoolean()from the channel.
  * <p>
- * Lambda expressions are introduced in Java 8 to facilitate functional 
- * programming. A Lambda expression is usually written using syntax 
- * (argument) -> (body). 
+ * Lambda expressions are introduced in Java 8 to facilitate functional
+ * programming. A Lambda expression is usually written using syntax
+ * (argument) -> (body).
  * <p>
  */
 package com.ociweb.iot;
 
-import static com.ociweb.iot.grove.AnalogDigitalTwig.LED;
+import static com.ociweb.iot.grove.simple_digital.SimpleDigitalTwig.LED;
 import static com.ociweb.iot.maker.Port.D5;
 
 import com.ociweb.gl.api.MessageReader;
@@ -23,7 +23,10 @@ import com.ociweb.iot.maker.FogRuntime;
 import com.ociweb.iot.maker.Hardware;
 import com.ociweb.iot.maker.FogApp;
 import com.ociweb.iot.maker.Port;
+import com.ociweb.pronghorn.pipe.BlobReader;
 import com.ociweb.pronghorn.pipe.BlobWriter;
+
+import java.io.IOException;
 
 public class IoTApp implements FogApp {
 
@@ -46,19 +49,25 @@ public class IoTApp implements FogApp {
 
         final FogCommandChannel blinkerChannel = runtime.newCommandChannel(DYNAMIC_MESSAGING);
         runtime.addPubSubListener(new PubSubListener() {
+
             @Override
-            public boolean message(CharSequence topic, MessageReader payload) {
+            public boolean message(CharSequence topic, BlobReader payload) {
 
-                boolean value = payload.readBoolean();
-                blinkerChannel.setValueAndBlock(LED_PORT, value, PAUSE);
-                boolean ignored = blinkerChannel.publishTopic(TOPIC, new PubSubWritable() {
-                    @Override
-                    public void write(BlobWriter w) {
-                        w.writeBoolean(!value);
-                    }
-                });
+                try {
+                    boolean value = payload.readBoolean();
+                    blinkerChannel.setValueAndBlock(LED_PORT, value, PAUSE);
+                    boolean ignored = blinkerChannel.publishTopic(TOPIC, new PubSubWritable() {
+                        @Override
+                        public void write(BlobWriter w) {
+                            w.writeBoolean(!value);
+                        }
+                    });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+
                 return true;
-
             }
         }).addSubscription(TOPIC);
 
