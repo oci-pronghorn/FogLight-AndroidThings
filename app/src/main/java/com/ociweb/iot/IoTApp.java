@@ -62,7 +62,7 @@ public class IoTApp implements FogApp {
                             w.writeBoolean(!value);
                         }
                     });
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     return false;
                 }
